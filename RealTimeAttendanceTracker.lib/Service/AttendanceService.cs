@@ -115,7 +115,7 @@ namespace RealTimeAttendanceTracker.lib.Service
                     {
                         data.StaffName = staff.StaffName;
                         data.Department = staff.Department;
-                        data.HandlingSubjects = string.Concat(",", staff.HandlingSubjects);
+                        data.HandlingSubjects = data.HandlingSubjects;
                         data.ModifiedAt = DateTime.Now;
                     }
                     else

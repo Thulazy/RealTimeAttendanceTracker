@@ -66,14 +66,17 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label asp-for="StaffName" class="form-label required"></label>
-                                        <input asp-for="StaffName" class="form-control" />
+                                        <input asp-for="StaffName" autocomplete="off" class="form-control" />
                                         <span asp-validation-for="StaffName" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label asp-for="Department" class="form-label required"></label>
-                                        <input asp-for="Department" class="form-control" />
+                                        <select class="form-control" asp-for="Department">
+                                            <option value="">Select Department</option>
+                                            <option value="CSE/IT">CSE/IT</option>
+                                        </select>
                                         <span asp-validation-for="Department" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -81,27 +84,26 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label asp-for="HandlingSubjects" class="form-label required"></label>
-                                        <select asp-for="SubjectList" class="form-control">
-                                            <option value="Compiler Design"></option>
-                                            <option value="Compiler Networks"></option>
-                                            <option value="Object Oriented Analysis and Design"></option>
-                                            <option value="Elective - II (Human Computer Interaction)"></option>
-                                            <option value="Elective - III(Business Intelligence)"></option>
-                                            <option value="Compiler Design Lab"></option>
-                                            <option value="Computer Networks Lab"></option>
-                                            <option value="Open CV Lab"></option>
-                                            <option value="Creative And Innovative Project"></option>
-                                            <option value="Deep Learning"></option>
+                                        <select asp-for="SubjectList" class="form-control" id="multiselect" multiple="multiple">
+                                            <option value="Compiler Design">Compiler Design</option>
+                                            <option value="Computer Networks">Computer Networks</option>
+                                            <option value="Object Oriented Analysis and Design">Object Oriented Analysis and Design</option>
+                                            <option value="Elective - II (Human Computer Interaction)">Elective - II (Human Computer Interaction)</option>
+                                            <option value="Elective - III(Business Intelligence)">Elective - III(Business Intelligence)</option>
+                                            <option value="Compiler Design Lab">Compiler Design Lab</option>
+                                            <option value="Computer Networks Lab">Computer Networks Lab</option>
+                                            <option value="Open CV Lab">Open CV Lab</option>
+                                            <option value="Creative And Innovative Project">Creative And Innovative Project</option>
+                                            <option value="Deep Learning">Deep Learning</option>
                                         </select>
                                     </div>
                                 </div>
-                                
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary w-100 btn-animation waves-effect waves-light" data-text="Save">
-                                        <span ng-if="!IsUpdate">Submit</span>
-                                        <span ng-if="IsUpdate">Update</span>
-                                    </button>
-                                </div>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end" style="float: right">
+                                <button type="submit" class="btn btn-primary w-100 btn-animation waves-effect waves-light" data-text="Save">
+                                    <span ng-if="!IsUpdate">Submit</span>
+                                    <span ng-if="IsUpdate">Update</span>
+                                </button>
                             </div>
                             <input type="hidden" id="RowKey" asp-for="Id" />
                             <input type="hidden" name="isUpdate" value="{{IsUpdate}}" />
@@ -116,13 +118,9 @@
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Reg. No</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Degree</th>
-                            <th scope="col">Year</th>
-                            <th scope="col">Mobile</th>
-                            <th scope="col">Date Of Birth</th>
-                            <th scope="col">Address</th>
+                            <th scope="col">Staff Name</th>
+                            <th scope="col">Department</th>
+                            <th scope="col">Handling Subjects</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -130,29 +128,19 @@
                         <tr ng-repeat="items in GridData track by items.id">
                             <th scope="row">{{$index + 1}}</th>
                             <td>
-                                {{items.regNo}}
+                                {{items.staffName}}
                             </td>
                             <td>
-                                {{items.name}}
+                                {{items.department}}
                             </td>
                             <td>
-                                {{items.degree}}
+                                <ul ng-repeat="x in items.handlingSubjects.split(',')">
+                                    <li>{{x}}</li>
+                                </ul>
                             </td>
                             <td>
-                                {{items.year}}
-                            </td>
-                            <td>
-                                {{items.mobile}}
-                            </td>
-                            <td>
-                                {{items.dateOfBirth | date:'dd-MM-yyyy'}}
-                            </td>
-                            <td>
-                                {{items.address}}
-                            </td>
-                            <td>
-                                <button type="button" ng-click="EditStudent(items.id)" class="btn btn-secondary bg-gradient waves-effect waves-light">Edit</button>
-                                <button type="button" ng-click="DeleteStudent(items)" class="btn btn-danger bg-gradient waves-effect waves-light">Delete</button>
+                                <button type="button" ng-click="EditStaff(items.id)" class="btn btn-secondary bg-gradient waves-effect waves-light">Edit</button>
+                                <button type="button" ng-click="DeleteStaff(items)" class="btn btn-danger bg-gradient waves-effect waves-light">Delete</button>
                             </td>
                         </tr>
                     </tbody>

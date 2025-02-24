@@ -22,6 +22,10 @@
     <link rel="stylesheet" href="~/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
     <link rel="stylesheet" href="~/plugins/daterangepicker/daterangepicker.css">
     <link rel="stylesheet" href="~/plugins/summernote/summernote-bs4.min.css">
+    <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
@@ -89,7 +93,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="./index2.html" class="nav-link">
+                                    <a href="@Url.Action("AddUpdateStaff", "Home")" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Staff Creation</p>
                                     </a>
@@ -122,6 +126,7 @@
         </aside>
         <input type="hidden" id="webHosted" value="@hostedUrl" />
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="~/plugins/jquery/jquery.min.js"></script>
     <script src="~/plugins/jquery-ui/jquery-ui.min.js"></script>
     <script>
@@ -145,8 +150,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/4.10.0/ui-grid.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-grid/4.10.0/ui-grid.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <script src="~/lib/Route.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
     <script>
         function getHostedUrl() {
             return $("#webHosted").val();
@@ -160,6 +166,18 @@
             }
             return true;
         }
+
+             $('select').select2({
+          theme: 'bootstrap4'
+        });
+
+               $(document).ready(function() {
+          $('#multiSelect').select2({
+            theme: 'bootstrap4', // Optional: Apply Bootstrap 4 styling
+            placeholder: "Select options", // Optional: Placeholder text
+            allowClear: true // Optional: Adds a clear (X) button
+          });
+        });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

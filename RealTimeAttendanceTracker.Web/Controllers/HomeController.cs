@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using MySqlX.XDevAPI.Common;
 using RealTimeAttendanceTracker.lib.Entity;
@@ -85,6 +86,7 @@ namespace RealTimeAttendanceTracker.Web.Controllers
                 var result = (await _attendanceService.GetStaffsAsync(primaryKey)).FirstOrDefault();
                 if (result != null)
                 {
+                    result.SubjectList = result.HandlingSubjects.Split(",").ToList();
                     return View(result);
                 }
             }
@@ -95,6 +97,7 @@ namespace RealTimeAttendanceTracker.Web.Controllers
         {
             try
             {
+                staff.HandlingSubjects = string.Join(",", staff.SubjectList);
                 var result = await _attendanceService.AddUpdateStaffAsync(staff);
                 if (result)
                 {

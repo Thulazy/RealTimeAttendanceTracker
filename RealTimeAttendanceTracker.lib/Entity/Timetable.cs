@@ -11,13 +11,9 @@ public partial class Timetable
 
     public string Time { get; set; } = null!;
 
-    public int StudentsRefId { get; set; }
-
-    public int StaffsRefId { get; set; }
-
     public DateTime CreatedAt { get; set; }
 
     public DateTime ModifiedAt { get; set; }
 
-    public ulong IsDeleted { get; set; }
+    public bool IsDeleted { get; set; } = false;
 }
