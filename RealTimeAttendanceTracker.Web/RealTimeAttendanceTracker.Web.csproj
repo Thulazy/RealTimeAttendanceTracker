@@ -7,7 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RealTimeAttendanceTracker.lib\RealTimeAttendanceTracker.lib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Services.Extensions.Logger">
+      <HintPath>..\..\NewsAdmin\Microsoft.Services.Extensions.Logger.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

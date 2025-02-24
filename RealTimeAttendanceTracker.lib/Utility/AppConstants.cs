@@ -11,6 +11,12 @@ namespace RealTimeAttendanceTracker.lib.Utility
         public class AppSettingKey
         {
             public const string MySqlConn = "MySqlConn";
+            public const string HostedUrl = "HostedUrl";
+        }
+        public class SessionKeys
+        {
+            public const string Id = "Id";
+            public const string Email = "Email";
         }
     }
 }

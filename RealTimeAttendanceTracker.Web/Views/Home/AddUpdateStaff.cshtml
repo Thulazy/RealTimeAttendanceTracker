@@ -1,0 +1,163 @@
+﻿@using Microsoft.AspNetCore.Http;
+@model RealTimeAttendanceTracker.lib.Entity.Staff
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Management</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Management</a></li>
+                    <li class="breadcrumb-item active">Staff</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<div class="card card-default" ng-app="attendanceModule" ng-controller="ctrlAttendance">
+    <div class="card-header">
+        <h3 class="card-title">Add Staff</h3>
+    </div>
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a href="#custom-hover-customere" id="addtab" data-toggle="tab" aria-expanded="false" class="nav-link active" aria-selected="true" role="tab">
+                <span ng-if="!IsUpdate">Add</span> <span ng-if="IsUpdate">Update</span>
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a ng-click="GetStaffs()" id="viewtab" href="#custom-hover-description" data-toggle="tab" aria-expanded="true" class="nav-link" aria-selected="false" tabindex="-1" role="tab">
+                View
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="custom-hover-customere" role="tabpanel">
+            <div class="card-body">
+                <div class="row">
+                    @using (Html.BeginForm("AddUpdateStaff", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        {
+                            if (TempData["Status"] != null)
+                            {
+                                if ((bool)TempData["Status"])
+                                {
+                                    <div class="alert alert-success" role="alert">
+                                        <strong>Success</strong> @TempData["StatusMessage"]
+                                    </div>
+                                    <br />
+                                }
+                                else
+                                {
+                                    <div class="alert alert-danger mb-xl-0" role="alert">
+                                        <strong>Error</strong> Technical Issue.
+                                    </div>
+                                    <br />
+                                }
+                            }
+                        }
+                        @Html.ValidationSummary(true)
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="container">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="StaffName" class="form-label required"></label>
+                                        <input asp-for="StaffName" class="form-control" />
+                                        <span asp-validation-for="StaffName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Department" class="form-label required"></label>
+                                        <input asp-for="Department" class="form-control" />
+                                        <span asp-validation-for="Department" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="HandlingSubjects" class="form-label required"></label>
+                                        <select asp-for="SubjectList" class="form-control">
+                                            <option value="Compiler Design"></option>
+                                            <option value="Compiler Networks"></option>
+                                            <option value="Object Oriented Analysis and Design"></option>
+                                            <option value="Elective - II (Human Computer Interaction)"></option>
+                                            <option value="Elective - III(Business Intelligence)"></option>
+                                            <option value="Compiler Design Lab"></option>
+                                            <option value="Computer Networks Lab"></option>
+                                            <option value="Open CV Lab"></option>
+                                            <option value="Creative And Innovative Project"></option>
+                                            <option value="Deep Learning"></option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100 btn-animation waves-effect waves-light" data-text="Save">
+                                        <span ng-if="!IsUpdate">Submit</span>
+                                        <span ng-if="IsUpdate">Update</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="RowKey" asp-for="Id" />
+                            <input type="hidden" name="isUpdate" value="{{IsUpdate}}" />
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="custom-hover-description" role="tabpanel">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Reg. No</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Degree</th>
+                            <th scope="col">Year</th>
+                            <th scope="col">Mobile</th>
+                            <th scope="col">Date Of Birth</th>
+                            <th scope="col">Address</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="items in GridData track by items.id">
+                            <th scope="row">{{$index + 1}}</th>
+                            <td>
+                                {{items.regNo}}
+                            </td>
+                            <td>
+                                {{items.name}}
+                            </td>
+                            <td>
+                                {{items.degree}}
+                            </td>
+                            <td>
+                                {{items.year}}
+                            </td>
+                            <td>
+                                {{items.mobile}}
+                            </td>
+                            <td>
+                                {{items.dateOfBirth | date:'dd-MM-yyyy'}}
+                            </td>
+                            <td>
+                                {{items.address}}
+                            </td>
+                            <td>
+                                <button type="button" ng-click="EditStudent(items.id)" class="btn btn-secondary bg-gradient waves-effect waves-light">Edit</button>
+                                <button type="button" ng-click="DeleteStudent(items)" class="btn btn-danger bg-gradient waves-effect waves-light">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

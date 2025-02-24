@@ -23,6 +23,7 @@ public partial class AttendanceContext : DbContext
     public virtual DbSet<Student> Students { get; set; }
 
     public virtual DbSet<Timetable> Timetables { get; set; }
+    public virtual DbSet<Login> Logins { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -51,6 +52,12 @@ public partial class AttendanceContext : DbContext
             entity.Property(e => e.IsDeleted).HasColumnType("bit(1)");
             entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
             entity.Property(e => e.StaffName).HasMaxLength(200);
+        });
+        modelBuilder.Entity<Login>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("login");
         });
 
         modelBuilder.Entity<Student>(entity =>

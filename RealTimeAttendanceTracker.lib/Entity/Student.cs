@@ -25,5 +25,5 @@ public partial class Student
 
     public DateTime ModifiedAt { get; set; }
 
-    public ulong IsDeleted { get; set; }
+    public bool IsDeleted { get; set; }
 }

@@ -1,0 +1,72 @@
+﻿@{
+    Layout = null;
+}
+@model RealTimeAttendanceTracker.lib.Entity.Login;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Real Time Attendance Tracker</title>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="~/plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
+</head>
+<body class="hold-transition login-page">
+    <div class="login-box">
+        <div class="card">
+            <div class="card-body login-card-body">
+                <p class="login-box-msg">Sign in to start your session</p>
+
+                @using (Html.BeginForm("Index", "Login", FormMethod.Post))
+                {
+                    {
+                        if (ViewBag.Status != null)
+                        {
+                            if (ViewBag.Status)
+                            {
+                                <div class="alert alert-success" role="alert">
+                                    <strong>Success</strong> @ViewBag.StatusMessage
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger mb-xl-0" role="alert">
+                                    <strong>Error</strong> Invalid Login Details.
+                                </div>
+                            }
+                        }
+                    }
+                    <div class="input-group mb-3">
+                        <input asp-for="Email" type="email" class="form-control" autocomplete="off" placeholder="Email">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-envelope"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input asp-for="Password" type="password" class="form-control" autocomplete="off" placeholder="Password">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/dist/js/adminlte.min.js"></script>
+</body>
+</html>
+
