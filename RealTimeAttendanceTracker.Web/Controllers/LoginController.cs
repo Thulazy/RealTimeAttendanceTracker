@@ -66,6 +66,10 @@ namespace RealTimeAttendanceTracker.Web.Controllers
                 throw;
             }
         }
-
+        public async Task<IActionResult> LogoutAsync()
+        {
+            await HttpContext.SignOutAsync();
+            return View();
+        }
     }
 }
