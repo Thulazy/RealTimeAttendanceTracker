@@ -62,17 +62,20 @@
                         @Html.AntiForgeryToken()
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <div class="container">
-                            <div class="row g-3">
-                                <div class="col-md-6">
+                            <div class="row row-cols-1 row-cols-md-2 g-3">
+                                <!-- Staff Name -->
+                                <div class="col">
                                     <div class="form-group">
-                                        <label asp-for="StaffName" class="form-label required"></label>
+                                        <label asp-for="StaffName" class="form-label required d-block"></label>
                                         <input asp-for="StaffName" autocomplete="off" class="form-control" />
                                         <span asp-validation-for="StaffName" class="text-danger"></span>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
+
+                                <!-- Department -->
+                                <div class="col">
                                     <div class="form-group">
-                                        <label asp-for="Department" class="form-label required"></label>
+                                        <label asp-for="Department" class="form-label required d-block"></label>
                                         <select class="form-control" asp-for="Department">
                                             <option value="">Select Department</option>
                                             <option value="CSE/IT">CSE/IT</option>
@@ -81,15 +84,16 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <!-- Handling Subjects -->
+                                <div class="col">
                                     <div class="form-group">
-                                        <label asp-for="HandlingSubjects" class="form-label required"></label>
+                                        <label asp-for="HandlingSubjects" class="form-label required d-block"></label>
                                         <select asp-for="SubjectList" class="form-control" id="multiselect" multiple="multiple">
                                             <option value="Compiler Design">Compiler Design</option>
                                             <option value="Computer Networks">Computer Networks</option>
                                             <option value="Object Oriented Analysis and Design">Object Oriented Analysis and Design</option>
                                             <option value="Elective - II (Human Computer Interaction)">Elective - II (Human Computer Interaction)</option>
-                                            <option value="Elective - III(Business Intelligence)">Elective - III(Business Intelligence)</option>
+                                            <option value="Elective - III(Business Intelligence)">Elective - III (Business Intelligence)</option>
                                             <option value="Compiler Design Lab">Compiler Design Lab</option>
                                             <option value="Computer Networks Lab">Computer Networks Lab</option>
                                             <option value="Open CV Lab">Open CV Lab</option>
@@ -99,11 +103,13 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-2 d-flex align-items-end" style="float: right">
-                                <button type="submit" class="btn btn-primary w-100 btn-animation waves-effect waves-light" data-text="Save">
-                                    <span ng-if="!IsUpdate">Submit</span>
-                                    <span ng-if="IsUpdate">Update</span>
-                                </button>
+                            <div class="row mt-3">
+                                <div class="col text-end">
+                                    <button type="submit" style="float: right" class="btn btn-primary btn-animation waves-effect waves-light px-4" data-text="Save">
+                                        <span ng-if="!IsUpdate">Submit</span>
+                                        <span ng-if="IsUpdate">Update</span>
+                                    </button>
+                                </div>
                             </div>
                             <input type="hidden" id="RowKey" asp-for="Id" />
                             <input type="hidden" name="isUpdate" value="{{IsUpdate}}" />

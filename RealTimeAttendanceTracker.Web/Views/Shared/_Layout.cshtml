@@ -27,6 +27,23 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
 
 </head>
+<style>
+    .select2-container {
+        width: 100% !important; /* Ensures it doesn't stretch too wide */
+    }
+
+        .select2-container .select2-selection--single {
+            height: 38px; /* Matches Bootstrap 4 form height */
+            font-size: 16px;
+            border-radius: 5px;
+            background: white;
+        }
+
+    .select2-container--bootstrap4 .select2-selection {
+        border-radius: 5px;
+    }
+
+</style>
 <body class="hold-transition sidebar-mini layout-fixed">
     <div class="wrapper">
 
@@ -99,7 +116,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="./index3.html" class="nav-link">
+                                    <a href="@Url.Action("AddUpdateTimeTable", "Home")" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Time table Creation</p>
                                     </a>
@@ -167,9 +184,13 @@
             return true;
         }
 
-             $('select').select2({
-          theme: 'bootstrap4'
+        $(document).ready(function () {
+            $('select').select2({
+                theme: 'bootstrap4',
+                width: 'resolve' 
+            });
         });
+
 
                $(document).ready(function() {
           $('#multiSelect').select2({

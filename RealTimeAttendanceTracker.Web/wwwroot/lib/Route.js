@@ -24,6 +24,28 @@ app.controller('ctrlAttendance', ['$scope', '$http', '$sce', "$window", function
     $scope.PageInputs = {};
     $scope.GridData = [];
     $scope.IsUpdate = false;
+
+    $scope.DaysAndSubjects = {
+        "Monday": ["", "", "", "", "", "", "", "", ""],
+        "Tuesday": ["", "", "", "", "", "", "", "", ""],
+        "Wednesday": ["", "", "", "", "", "", "", "", ""],
+        "Thursday": ["", "", "", "", "", "", "", "", ""],
+        "Friday": ["", "", "", "", "", "", "", "", ""]
+    };
+
+    $scope.SubjectList = [
+        "Compiler Design",
+        "Computer Networks",
+        "Object Oriented Analysis and Design",
+        "Elective - II (Human Computer Interaction)",
+        "Elective - III (Business Intelligence)",
+        "Compiler Design Lab",
+        "Computer Networks Lab",
+        "Open CV Lab",
+        "Creative And Innovative Project",
+        "Deep Learning"
+    ];
+
     $scope.EditStudent = function (key) {
         window.location.href = getHostedUrl() + "/Home/AddUpdateStudents?id=" + key;
     }
@@ -75,6 +97,42 @@ app.controller('ctrlAttendance', ['$scope', '$http', '$sce', "$window", function
             cache: false,
             url: getHostedUrl() + "/Home/GetStaffs",
             method: "GET"
+        }).then(function (data, status, headers, config) {
+            $scope.GridData = [];
+            $scope.GridData = data.data;
+        }, function errorCallback(response) {
+            ErrorEvt();
+        });
+    }
+    $scope.GetTimeTable = function () {
+        debugger;
+        $http({
+            async: false,
+            cache: false,
+            url: getHostedUrl() + "/Home/GetTimeTable",
+            method: "GET"
+        }).then(function (data, status, headers, config) {
+            let orderedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+
+            $scope.DaysAndSubjects = {};
+            orderedDays.forEach(day => {
+                $scope.DaysAndSubjects[day] = data[day] || ["", "", "", "", "", "LUNCH", "", "", ""];
+            });
+        }, function errorCallback(response) {
+            ErrorEvt();
+        });
+    }
+    $scope.AddTimeTable = function () {
+        let orderedDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+        orderedDays.forEach(day => {
+            $scope.DaysAndSubjects[day] = $scope.DaysAndSubjects[day] || ["", "", "", "", "", "LUNCH", "", "", ""];
+        });
+        $http({
+            async: false,
+            cache: false,
+            url: getHostedUrl() + "/Home/AddTimeTable",
+            method: "POST",
+            params: { data: JSON.stringify($scope.DaysAndSubjects) }
         }).then(function (data, status, headers, config) {
             $scope.GridData = [];
             $scope.GridData = data.data;

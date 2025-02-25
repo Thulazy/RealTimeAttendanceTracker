@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace RealTimeAttendanceTracker.lib.Service
 {
@@ -155,19 +156,101 @@ namespace RealTimeAttendanceTracker.lib.Service
         {
             try
             {
-                using(var db = new AttendanceContext())
+                using (var db = new AttendanceContext())
                 {
-                    var data = await db.Staffs.FirstOrDefaultAsync(x=>x.Id == id);
-                    if(data != null)
+                    var data = await db.Staffs.FirstOrDefaultAsync(x => x.Id == id);
+                    if (data != null)
                     {
                         data.IsDeleted = !data.IsDeleted;
                     }
                     await db.SaveChangesAsync();
                     return true;
                 }
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return false;
+            }
+        }
+        #endregion
+        #region timetable
+        public async Task<bool> AddTimeTableAsync(Dictionary<string, List<string>> data)
+        {
+            try
+            {
+                using (var db = new AttendanceContext())
+                {
+                    var timeTableEntries = new List<Timetable>();
+
+                    foreach (var dayEntry in data) // Loop through days
+                    {
+                        string day = dayEntry.Key; 
+                        List<string> subjects = dayEntry.Value; // List of subjects for the day
+
+                        for (int i = 0; i < subjects.Count; i++) // Loop through 8 periods
+                        {
+                            if (!string.IsNullOrEmpty(subjects[i]) && subjects[i] != "LUNCH") // Only save if subject is not empty
+                            {
+                                timeTableEntries.Add(new Timetable
+                                {
+                                    Subject = subjects[i],
+                                    Time = i + 1, // Period starts from 1
+                                    Year = "3rd",
+                                    Day = day
+                                });
+                            }
+                        }
+                    }
+                    await db.Timetables.AddRangeAsync(timeTableEntries);
+                    await db.SaveChangesAsync();
+                    return true;
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+        public async Task<Dictionary<string, List<string>>> GetTimeTableAsync()
+        {
+            try
+            {
+                using (var db = new AttendanceContext())
+                {
+                    var data = await db.Timetables.AsNoTracking().Where(x => !x.IsDeleted).ToListAsync();
+                    List<string> days = new List<string> { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
+
+                    var timetable = new Dictionary<string, List<string>>();
+
+                    foreach (var day in days)
+                    {
+                        var subjects = new string[9]; // Create array of 8 empty slots
+                        Array.Fill(subjects, ""); // Default all periods to empty strings
+
+                        var periods = data.Where(t => t.Day == day).ToList();
+
+                        foreach (var period in periods)
+                        {
+                            if (period.Time >= 1 && period.Time <= 8) // Ensure period is within valid range
+                            {
+                                subjects[period.Time - 1] = period.Subject ?? ""; // Assign subject or empty string
+                            }
+                        }
+
+                        // Ensure the 6th period is "LUNCH"
+                        subjects[5] = "LUNCH";
+
+                        timetable[day] = subjects.ToList();
+                    }
+
+                    return timetable;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
             }
         }
         #endregion

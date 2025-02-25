@@ -127,11 +127,14 @@
                                         <span asp-validation-for="Address" class="text-danger"></span>
                                     </div>
                                 </div>
-                                <div class="col-md-2 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary w-100 btn-animation waves-effect waves-light" data-text="Save">
-                                        <span ng-if="!IsUpdate">Submit</span>
-                                        <span ng-if="IsUpdate">Update</span>
-                                    </button>
+                                <div class="col-md-6 d-flex align-items-end">
+                                    <div class="form-group">
+
+                                        <button type="submit" class="btn btn-primary w-100 btn-animation waves-effect waves-light" data-text="Save">
+                                            <span ng-if="!IsUpdate">Submit</span>
+                                            <span ng-if="IsUpdate">Update</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <input type="hidden" id="RowKey" asp-for="Id" />

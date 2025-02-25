@@ -1,0 +1,216 @@
+﻿@using Microsoft.AspNetCore.Http;
+<style>
+    /* Container Styling */
+    .container {
+        margin-top: 40px;
+        padding: 10px;
+    }
+
+    /* Responsive Table */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Table Styling */
+    .table {
+        border: 3px solid #3B82F6;
+        border-radius: 10px;
+        overflow: hidden;
+        width: 100%;
+        background: white;
+    }
+
+    /* Table Head */
+    thead {
+        background: #1E3A8A; /* Deep Blue */
+        color: #FACC15; /* Warm Yellow */
+        font-size: 18px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    th, td {
+        text-align: center;
+        padding: 12px;
+        font-size: 16px;
+        border: 2px solid #3B82F6;
+        transition: all 0.3s ease;
+    }
+
+    /* Alternating Row Colors */
+    tbody tr:nth-child(even) {
+        background: rgba(59, 130, 246, 0.1); /* Light Blue */
+    }
+
+    tbody tr:nth-child(odd) {
+        background: rgba(243, 244, 246, 0.5); /* Soft Grey */
+    }
+
+    /* Hover Effect */
+    tbody tr:hover {
+        background: #3B82F6; /* Vibrant Blue */
+        color: white;
+        font-weight: bold;
+    }
+
+    /* Select Box Styling */
+    .select-box {
+        width: 100%;
+        padding: 5px;
+        font-size: 16px;
+        border: 2px solid #3B82F6;
+        background: #F3F4F6;
+        color: #1F2937;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+
+        .select-box:focus {
+            outline: none;
+            border-color: #1E3A8A;
+            box-shadow: 0 0 5px #1E3A8A;
+        }
+
+    /* Heading */
+    .heading {
+        text-align: center;
+        font-size: 30px;
+        font-weight: bold;
+        color: #1E3A8A;
+        text-shadow: 2px 2px 8px rgba(30, 58, 138, 0.7);
+        margin-bottom: 15px;
+    }
+
+    /* Responsive Styles */
+    @@media (max-width: 1024px) {
+        th, td {
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        .heading {
+            font-size: 26px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        th, td {
+            font-size: 12px;
+            padding: 8px;
+        }
+
+        .heading {
+            font-size: 22px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        th, td {
+            font-size: 10px;
+            padding: 6px;
+        }
+
+        .heading {
+            font-size: 18px;
+        }
+
+        .select-box {
+            font-size: 14px;
+        }
+    }
+
+    .lunch-cell {
+        background-color: #FFD700; /* Gold color */
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .selected-cell {
+        background-color: #3d84cf; /* Light blue highlight for selected subject */
+    }
+
+</style>
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Management</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Management</a></li>
+                    <li class="breadcrumb-item active">Time Table</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<div class="card card-default" ng-app="attendanceModule" ng-controller="ctrlAttendance">
+    <div class="card-header">
+        <h3 class="card-title">Add Time Table</h3>
+    </div>
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a href="#custom-hover-customere" id="addtab" data-toggle="tab" aria-expanded="false" class="nav-link active" aria-selected="true" role="tab">
+                <span ng-if="!IsUpdate">Add</span> <span ng-if="IsUpdate">Update</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content" ng-init="GetTimeTable()">
+        <div class="tab-pane fade show active" id="custom-hover-customere" role="tabpanel">
+            <div class="card-body">
+                <div class="row">
+                    <div class="container">
+                        <div class="heading">Weekly Class Timetable</div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-center">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>Day</th>
+                                        <th>1</th>
+                                        <th>2</th>
+                                        <th>3</th>
+                                        <th>4</th>
+                                        <th>5</th>
+                                        <th></th>
+                                        <th>6</th>
+                                        <th>7</th>
+                                        <th>8</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="(day, subjects) in DaysAndSubjects">
+                                        <td class="day-column">{{ day }}</td>
+                                        <td ng-repeat="(index, subject) in subjects track by $index" ng-class="{'selected-cell': DaysAndSubjects[day][index]}">
+                                            <select class="form-control" ng-if="index !== 5" ng-model="DaysAndSubjects[day][index]">
+                                                <option value="">Select Subject</option>
+                                                <option value="Compiler Design">Compiler Design</option>
+                                                <option value="Computer Networks">Computer Networks</option>
+                                                <option value="Object Oriented Analysis and Design">Object Oriented Analysis and Design</option>
+                                                <option value="Elective - II (Human Computer Interaction)">Elective - II (Human Computer Interaction)</option>
+                                                <option value="Elective - III (Business Intelligence)">Elective - III (Business Intelligence)</option>
+                                                <option value="Compiler Design Lab">Compiler Design Lab</option>
+                                                <option value="Computer Networks Lab">Computer Networks Lab</option>
+                                                <option value="Open CV Lab">Open CV Lab</option>
+                                                <option value="Creative And Innovative Project">Creative And Innovative Project</option>
+                                                <option value="Deep Learning">Deep Learning</option>
+                                            </select>
+                                            <span class="lunch-cell" ng-show="index === 5">LUNCH</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button type="button" ng-click="AddTimeTable()" style="float: right" class="btn btn-primary btn-animation waves-effect waves-light px-4" data-text="Save">
+                                <span>Submit</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

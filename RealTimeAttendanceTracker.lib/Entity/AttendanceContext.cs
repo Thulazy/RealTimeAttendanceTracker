@@ -88,7 +88,6 @@ public partial class AttendanceContext : DbContext
             entity.Property(e => e.IsDeleted).HasColumnType("bit(1)");
             entity.Property(e => e.ModifiedAt).HasColumnType("datetime");
             entity.Property(e => e.Subject).HasMaxLength(200);
-            entity.Property(e => e.Time).HasMaxLength(200);
         });
 
         OnModelCreatingPartial(modelBuilder);

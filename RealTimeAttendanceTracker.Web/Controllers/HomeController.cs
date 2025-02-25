@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using MySqlX.XDevAPI.Common;
+using Newtonsoft.Json;
 using RealTimeAttendanceTracker.lib.Entity;
 using RealTimeAttendanceTracker.lib.Service;
 using RealTimeAttendanceTracker.Web.Models;
@@ -130,6 +131,23 @@ namespace RealTimeAttendanceTracker.Web.Controllers
         public async Task<JsonResult> DeleteStaffAsync(int id)
         {
             var result = await _attendanceService.DeleteStaffAsync(id);
+            return Json(result);
+        }
+        #endregion
+        #region timetable
+        public IActionResult AddUpdateTimeTable()
+        {
+            return View();
+        }
+        public async Task<JsonResult> AddTimeTableAsync(string data)
+        {
+            var json = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(data);
+            var result = await _attendanceService.AddTimeTableAsync(json);
+            return Json(result);
+        }
+        public async Task<JsonResult> GetTimeTableAsync()
+        {
+            var result = await _attendanceService.GetTimeTableAsync();
             return Json(result);
         }
         #endregion
