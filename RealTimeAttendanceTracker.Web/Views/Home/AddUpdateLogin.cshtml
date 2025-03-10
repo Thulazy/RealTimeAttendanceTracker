@@ -1,0 +1,147 @@
+﻿@using Microsoft.AspNetCore.Http;
+@model RealTimeAttendanceTracker.lib.Entity.Login
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Management</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Management</a></li>
+                    <li class="breadcrumb-item active">Create Login</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<div class="card card-default" ng-app="attendanceModule" ng-controller="ctrlAttendance">
+    <div class="card-header">
+        <h3 class="card-title">Create Login</h3>
+    </div>
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a href="#custom-hover-customere" id="addtab" data-toggle="tab" aria-expanded="false" class="nav-link active" aria-selected="true" role="tab">
+                <span ng-if="!IsUpdate">Add</span> <span ng-if="IsUpdate">Update</span>
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a ng-click="GetLogins()" id="viewtab" href="#custom-hover-description" data-toggle="tab" aria-expanded="true" class="nav-link" aria-selected="false" tabindex="-1" role="tab">
+                View
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="custom-hover-customere" role="tabpanel">
+            <div class="card-body">
+                @using (Html.BeginForm("AddUpdateLogin", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    {
+                        if (TempData["Status"] != null)
+                        {
+                            if ((bool)TempData["Status"])
+                            {
+                                <div class="alert alert-success" role="alert">
+                                    <strong>Success</strong> @TempData["StatusMessage"]
+                                </div>
+                                <br />
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger mb-xl-0" role="alert">
+                                    <strong>Error</strong> Technical Issue.
+                                </div>
+                                <br />
+                            }
+                        }
+                    }
+                    @Html.ValidationSummary(true)
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="container">
+                        <div class="row g-3">
+                            <!-- Staff Name -->
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Email" class="form-label required d-block"></label>
+                                    <input asp-for="Email" autocomplete="off" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!-- Department -->
+                           
+
+                            <!-- Handling Subjects -->
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Password" class="form-label required d-block"></label>
+                                    <input asp-for="Password" autocomplete="off" class="form-control" />
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-group">
+                                <label asp-for="Role" class="form-label required d-block"></label>
+                                <select class="form-control" asp-for="Role">
+                                    <option value="">Select Role</option>
+                                    <option value="Student">Student</option>
+                                    <option value="Staff">Staff</option>
+                                </select>
+                                <span asp-validation-for="Role" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="row col-12 col-md-6" style="float: right">
+                            <div class="col text-end">
+                                <button type="submit" class="btn btn-primary btn-animation waves-effect waves-light px-4">
+                                    <span ng-if="!IsUpdate">Submit</span>
+                                    <span ng-if="IsUpdate">Update</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="RowKey" asp-for="Id" />
+                        <input type="hidden" name="isUpdate" value="{{IsUpdate}}" />
+                    </div>
+
+                }
+            </div>
+        </div>
+        <div class="tab-pane fade" id="custom-hover-description" role="tabpanel">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Password</th>
+                            <th scope="col">Role</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="items in GridData track by items.id">
+                            <th scope="row">{{$index + 1}}</th>
+                            <td>
+                                {{items.email}}
+                            </td>
+                            <td>
+                                {{items.password}}
+                            </td>
+                            <td>
+                                {{items.role || 'Admin'}}
+                            </td>
+                            <td>
+                                <button type="button" ng-click="EditLogin(items.id)" class="btn btn-secondary bg-gradient waves-effect waves-light">Edit</button>
+                                <button type="button" ng-click="DeleteLogin(items)" class="btn btn-danger bg-gradient waves-effect waves-light">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

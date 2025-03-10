@@ -151,6 +151,60 @@ namespace RealTimeAttendanceTracker.Web.Controllers
             return Json(result);
         }
         #endregion
+        #region login
+        public async Task<IActionResult> AddUpdateLoginAsync(string id)
+        {
+            if (!string.IsNullOrEmpty(id))
+            {
+                var result = (await _attendanceService.GetLoginsAsync(id)).FirstOrDefault();
+                if(result != null)
+                {
+                    return View(result);
+                }
+            }
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddUpdateLoginAsync(Login login, bool isUpdate = false)
+        {
+            try
+            {
+                var result = await _attendanceService.AddUpdateLoginAsync(login);
+                if (result)
+                {
+                    TempData["Status"] = result;
+                    if (isUpdate)
+                    {
+                        TempData["StatusMessage"] = "Login has been updated successfully.";
+                        return RedirectToAction("AddUpdateLogin");
+                    }
+                    else
+                    {
+                        TempData["StatusMessage"] = "Login has been added successfully.";
+                        return RedirectToAction("AddUpdateLogin");
+                    }
+                }
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["Status"] = false;
+                return View(new Login { });
+            }
+
+        }
+
+        public async Task<JsonResult> GetLoginsAsync()
+        {
+            var result = await _attendanceService.GetLoginsAsync();
+            return Json(result);
+        }
+        public async Task<JsonResult> DeleteLoginAsync(int id)
+        {
+            var result = await _attendanceService.DeleteLoginAsync(id);
+            return Json(result);
+        }
+        #endregion
 
         public IActionResult Privacy()
         {

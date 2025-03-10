@@ -52,6 +52,22 @@ app.controller('ctrlAttendance', ['$scope', '$http', '$sce', "$window", function
     $scope.EditStaff = function (key) {
         window.location.href = getHostedUrl() + "/Home/AddUpdateStaff?id=" + key;
     }
+    $scope.EditLogin = function (key) {
+        window.location.href = getHostedUrl() + "/Home/AddUpdateLogin?id=" + key;
+    }
+    $scope.DeleteLogin = function (items) {
+        $http({
+            async: false,
+            cache: false,
+            url: getHostedUrl() + "/Home/DeleteLogin?id=" + items.id,
+            method: "POST"
+        }).then(function (data, status, headers, config) {
+            SuccessEvt();
+            $scope.GetLogins();
+        }, function errorCallback(response) {
+            ErrorEvt();
+        });
+    }
     $scope.DeleteStudent = function (items) {
         $http({
             async: false,
@@ -74,6 +90,19 @@ app.controller('ctrlAttendance', ['$scope', '$http', '$sce', "$window", function
         }).then(function (data, status, headers, config) {
             SuccessEvt();
             $scope.GetStaffs();
+        }, function errorCallback(response) {
+            ErrorEvt();
+        });
+    }
+    $scope.GetLogins = function () {
+        $http({
+            async: false,
+            cache: false,
+            url: getHostedUrl() + "/Home/GetLogins",
+            method: "GET"
+        }).then(function (data, status, headers, config) {
+            $scope.GridData = [];
+            $scope.GridData = data.data;
         }, function errorCallback(response) {
             ErrorEvt();
         });

@@ -254,5 +254,66 @@ namespace RealTimeAttendanceTracker.lib.Service
             }
         }
         #endregion
+        #region login
+        public async Task<bool> AddUpdateLoginAsync(Login login)
+        {
+            try
+            {
+                using(var db = new AttendanceContext())
+                {
+                    var data = await db.Logins.FirstOrDefaultAsync(x => x.Id == login.Id);
+                    if(data != null)
+                    {
+                        data.Email = login.Email;   
+                        data.Password = login.Password;
+                        data.Role = login.Role;
+                    }
+                    else
+                    {
+                        await db.Logins.AddAsync(login);
+                    }
+                    await db.SaveChangesAsync();    
+                    return true;
+                }
+            }catch(Exception ex)
+            {
+                return false;
+            }
+        }
+        public async Task<List<Login>> GetLoginsAsync(string id = "")
+        {
+            using(var db = new AttendanceContext())
+            {
+                var data = db.Logins.AsNoTracking().Where(x=>!x.IsDeleted).AsQueryable();
+                if (!string.IsNullOrEmpty(id))
+                {
+                    int primaryKey = Convert.ToInt32(id);
+                    data = data.Where(x => x.Id == primaryKey);
+                }
+                var result = await data.ToListAsync();
+                return result;
+            }
+        }
+
+        public async Task<bool> DeleteLoginAsync(int id)
+        {
+            try
+            {
+                using(var db = new AttendanceContext())
+                {
+                    var data = await db.Logins.FirstOrDefaultAsync(x => x.Id == id);
+                    if(data != null)
+                    {
+                        data.IsDeleted = !data.IsDeleted;
+                    }
+                    await db.SaveChangesAsync();
+                    return true;
+                }
+            }catch(Exception ex)
+            {
+                return false;
+            }
+        }
+        #endregion
     }
 }

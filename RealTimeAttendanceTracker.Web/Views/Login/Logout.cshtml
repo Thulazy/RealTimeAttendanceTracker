@@ -1,0 +1,86 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout - AdminLTE</title>
+
+    <!-- AdminLTE Styles -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+
+    <!-- FontAwesome (For Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: #343a40; /* Dark background */
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .logout-box {
+            background: #1f2d3d;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            color: #ffffff;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        .btn-logout {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            background: #007bff;
+            border: none;
+            border-radius: 5px;
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+
+            .btn-logout:hover {
+                background: #0056b3;
+            }
+
+        .fa-check-circle {
+            font-size: 50px;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-box">
+        <i class="fa fa-check-circle"></i>
+        <h1>Logout Successful</h1>
+        <p>You have been securely logged out.</p>
+        <a href="@Url.Action("Index", "Login")" class="btn btn-logout">
+            <i class="fas fa-home"></i> Sign in again
+        </a>
+    </div>
+</body>
+</html>
