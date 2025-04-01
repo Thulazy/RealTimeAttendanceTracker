@@ -40,7 +40,8 @@ namespace RealTimeAttendanceTracker.Web.Controllers
                     var claims = new List<Claim>
         {
             new Claim(AppConstants.SessionKeys.Id, result.Id.ToString()),
-            new Claim(AppConstants.SessionKeys.Email, result.Email)
+            new Claim(AppConstants.SessionKeys.Email, result.Email),
+            new Claim(AppConstants.SessionKeys.Role, result.Role)
         };
 
                     var claimsIdentity = new ClaimsIdentity(

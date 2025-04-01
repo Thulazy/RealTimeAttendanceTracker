@@ -17,6 +17,7 @@ namespace RealTimeAttendanceTracker.lib.Utility
         {
             public const string Id = "Id";
             public const string Email = "Email";
+            public const string Role = "Role";
         }
     }
 }

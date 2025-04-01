@@ -1,5 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Http;
+@using RealTimeAttendanceTracker.lib.Utility
 @model RealTimeAttendanceTracker.lib.Entity.Login
+@{
+    string role = Context.Session.GetString(AppConstants.SessionKeys.Role);
+}
 <div class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -72,8 +76,6 @@
                             </div>
 
                             <!-- Department -->
-                           
-
                             <!-- Handling Subjects -->
                             <div class="col-12 col-md-6">
                                 <div class="form-group">
@@ -88,6 +90,10 @@
                                 <label asp-for="Role" class="form-label required d-block"></label>
                                 <select class="form-control" asp-for="Role">
                                     <option value="">Select Role</option>
+                                    @if (role == "Admin")
+                                    {
+                                        <option value="Admin">Admin</option>
+                                    }
                                     <option value="Student">Student</option>
                                     <option value="Staff">Staff</option>
                                 </select>
