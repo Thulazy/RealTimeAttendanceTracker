@@ -12,13 +12,18 @@ namespace RealTimeAttendanceTracker.lib.Service
     public class AttendanceService
     {
         #region login
-        public async Task<Login> ValidateLoginAsync(string email, string password)
+        public async Task<Login> ValidateLoginAsync(string email, string password, string userType ="")
         {
             try
             {
                 using (var db = new AttendanceContext())
                 {
-                    var data = await db.Logins.FirstOrDefaultAsync(x => x.Email == email && x.Password == password);
+                    if (!string.IsNullOrEmpty(userType))
+                    {
+                        var result = await db.Logins.FirstOrDefaultAsync(x => x.Email == email && x.Password == password && x.Role == userType && !x.IsDeleted);
+                        return result;
+                    }
+                    var data = await db.Logins.FirstOrDefaultAsync(x => x.Email == email && x.Password == password && !x.IsDeleted);
                     return data;
                 }
             }
