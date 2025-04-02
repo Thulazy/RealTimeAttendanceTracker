@@ -13,10 +13,14 @@ namespace RealTimeAttendanceTracker.lib.Entity
         public string? Email { get; set; }
         public string? Password { get; set; }
         public string? Role { get; set; }   
+        public int? StudentsRefId { get; set; }  
+        public int? StaffsRefId {  get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime ModifiedAt { get; set; } = DateTime.Now;
         public bool IsDeleted { get; set; } = false;
         [NotMapped]
         public string? UserType { get; set; }
+        public virtual Student StudentsRef { get; set; }
+        public virtual Staff StaffsRef { get; set; }
     }
 }

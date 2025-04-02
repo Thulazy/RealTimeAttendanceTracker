@@ -272,6 +272,14 @@ namespace RealTimeAttendanceTracker.lib.Service
                         data.Email = login.Email;   
                         data.Password = login.Password;
                         data.Role = login.Role;
+                        if(login.Role == "Student" && login.StudentsRefId != null && login.StudentsRefId.HasValue)
+                        {
+                            data.StudentsRefId = login.StudentsRefId.Value;
+                        }
+                        if(login.Role == "Staff" && login.StaffsRefId != null && login.StaffsRefId.HasValue)
+                        {
+                            data.StaffsRefId = login.StaffsRefId.Value;
+                        }
                     }
                     else
                     {

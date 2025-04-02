@@ -56,7 +56,7 @@ namespace RealTimeAttendanceTracker.Web
                         .AllowAnyHeader());
             });
             builder.Services.AddControllers();
-            builder.WebHost.UseUrls("http://192.168.1.10:5248");
+            //builder.WebHost.UseUrls("http://192.168.1.10:5248");
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

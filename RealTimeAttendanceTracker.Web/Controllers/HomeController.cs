@@ -1,6 +1,8 @@
+using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MySqlX.XDevAPI.Common;
 using Newtonsoft.Json;
 using RealTimeAttendanceTracker.lib.Entity;
@@ -9,14 +11,11 @@ using RealTimeAttendanceTracker.Web.Models;
 
 namespace RealTimeAttendanceTracker.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly AttendanceService _attendanceService;
-        public HomeController(ILogger<HomeController> logger, AttendanceService attendanceService)
+        public HomeController(AttendanceService service) : base(service)
         {
-            _logger = logger;
-            _attendanceService = attendanceService;
         }
 
         public IActionResult Index()
@@ -153,7 +152,9 @@ namespace RealTimeAttendanceTracker.Web.Controllers
         #endregion
         #region login
         public async Task<IActionResult> AddUpdateLoginAsync(string id)
-        {
+        {            
+            ViewBag.Students = await GetStudentsAsync();
+            ViewBag.Staffs = await GetStaffsAsync();
             if (!string.IsNullOrEmpty(id))
             {
                 var result = (await _attendanceService.GetLoginsAsync(id)).FirstOrDefault();

@@ -26,4 +26,8 @@ public partial class Student
     public DateTime ModifiedAt { get; set; }
 
     public bool IsDeleted { get; set; }
+    public virtual ICollection<Student> Students { get; set; } = new List<Student>();
+
+    public virtual ICollection<Staff> Staffs { get; set; } = new List<Staff>();
+
 }

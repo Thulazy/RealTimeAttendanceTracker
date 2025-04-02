@@ -39,19 +39,41 @@ namespace RealTimeAttendanceTracker.Web.Controllers
                 var result = await _attendanceSerivce.ValidateLoginAsync(email, password, userType);
                 if (result != null)
                 {
-                    var response = new
+                    if(userType == "Student")
                     {
-                        status = true,
-                        message = "Login successful",
-                        data = new
+                        var userInfo = (await _attendanceSerivce.GetStudentsAsync(result.StudentsRefId ?? 0)).FirstOrDefault();
+                        var response = new
                         {
-                            id = result.Id,
-                            email = result.Email,
-                            role = result.Role
-                        }
-                    };
+                            status = true,
+                            message = "Login successful",
+                            data = new
+                            {
+                                id = result.Id,
+                                email = result.Email,
+                                role = result.Role,
+                                userInfo = userInfo
+                            }
+                        };
+                        return Ok(response); // Return JSON response
+                    }
+                    if (userType == "Staff")
+                    {
+                        var userInfo = (await _attendanceSerivce.GetStaffsAsync(result.StaffsRefId ?? 0)).FirstOrDefault();
+                        var response = new
+                        {
+                            status = true,
+                            message = "Login successful",
+                            data = new
+                            {
+                                id = result.Id,
+                                email = result.Email,
+                                role = result.Role,
+                                userInfo = userInfo
+                            }
+                        };
+                        return Ok(response); // Return JSON response
+                    }
 
-                    return Ok(response); // Return JSON response
                 }
 
                 return Unauthorized(new { status = false, message = "Invalid credentials." });
