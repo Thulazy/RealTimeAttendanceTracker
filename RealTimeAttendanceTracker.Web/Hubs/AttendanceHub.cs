@@ -128,7 +128,7 @@ public class AttendanceHub : Hub
             double staffLong = staffLocation.Long;
 
             double distance = CalculateDistance(studentLat, studentLong, staffLat, staffLong); // in meters
-            string status = (distance <= 20) ? "Present" : "Absent";
+            string status = (distance <= 10) ? "Present" : "Absent";
 
             // Save or update attendance status in memory or DB
             var record = new AttendanceRecord
