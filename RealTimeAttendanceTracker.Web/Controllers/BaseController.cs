@@ -12,11 +12,6 @@ namespace RealTimeAttendanceTracker.Web.Controllers
         {
             _attendanceService = attendanceService;
         }
-        public IActionResult Index()
-        {
-            
-            return View();
-        }
 
         protected async Task<List<SelectListItem>> GetStudentsAsync()
         {

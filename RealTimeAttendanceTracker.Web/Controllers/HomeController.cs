@@ -13,7 +13,6 @@ namespace RealTimeAttendanceTracker.Web.Controllers
 {
     public class HomeController : BaseController
     {
-        private readonly AttendanceService _attendanceService;
         public HomeController(AttendanceService service) : base(service)
         {
         }
@@ -153,8 +152,8 @@ namespace RealTimeAttendanceTracker.Web.Controllers
         #region login
         public async Task<IActionResult> AddUpdateLoginAsync(string id)
         {            
-            ViewBag.Students = await GetStudentsAsync();
-            ViewBag.Staffs = await GetStaffsAsync();
+            ViewBag.Students = await _attendanceService.GetStudentsAsync();
+            ViewBag.Staffs = await _attendanceService.GetStaffsAsync();
             if (!string.IsNullOrEmpty(id))
             {
                 var result = (await _attendanceService.GetLoginsAsync(id)).FirstOrDefault();

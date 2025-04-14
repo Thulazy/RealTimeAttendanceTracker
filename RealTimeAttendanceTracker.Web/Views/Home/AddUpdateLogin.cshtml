@@ -85,51 +85,55 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-md-6">
-                            <div class="form-group">
-                                <label asp-for="Role" class="form-label required d-block"></label>
-                                <select class="form-control" ng-model="PageInputs.Role" asp-for="Role">
-                                    <option value="">Select Role</option>
-                                    @if (role == "Admin")
-                                    {
-                                        <option value="Admin">Admin</option>
-                                    }
-                                    <option value="Student">Student</option>
-                                    <option value="Staff">Staff</option>
-                                </select>
-                                <span asp-validation-for="Role" class="text-danger"></span>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6" ng-if="PageInputs.Role === 'Student'">
-                            <div class="form-group">
-                                <label asp-for="StudentsRefId" class="form-label required d-block"></label>
-                                <select class="form-control" asp-for="StudentsRefId">
-                                    @if (ViewBag.Students != null)
-                                    {
-                                        foreach (var items in ViewBag.Students)
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Role" class="form-label required d-block"></label>
+                                    <select class="form-control" ng-model="PageInputs.Role" asp-for="Role">
+                                        <option value="">Select Role</option>
+                                        @if (role == "Admin")
                                         {
-                                            <option value="@items.Value">@items.Text</option>
+                                            <option value="Admin">Admin</option>
                                         }
-                                    }
-                                </select>
-                                <span asp-validation-for="StudentsRefId" class="text-danger"></span>
+                                        <option value="Student">Student</option>
+                                        <option value="Staff">Staff</option>
+                                    </select>
+                                    <span asp-validation-for="Role" class="text-danger"></span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-12 col-md-6" ng-if="PageInputs.Role === 'Staff'">
-                            <div class="form-group">
-                                <label asp-for="StaffsRefId" class="form-label required d-block"></label>
-                                <select class="form-control" asp-for="StaffsRefId">
-                                    @if (ViewBag.Staffs != null)
-                                    {
-                                        foreach (var items in ViewBag.Staffs)
+                            <div class="col-12 col-md-6" ng-if="PageInputs.Role === 'Student'">
+                                <div class="form-group">
+                                    <label asp-for="StudentsRefId" class="form-label required d-block"></label>
+                                    <select class="form-control" asp-for="StudentsRefId">
+                                        @if (ViewBag.Students != null)
                                         {
-                                            <option value="@items.Value">@items.Text</option>
+                                            foreach (var items in ViewBag.Students)
+                                            {
+                                                <option value="@items.Id">@items.Name</option>
+                                            }
                                         }
-                                    }
-                                </select>
-                                <span asp-validation-for="StaffsRefId" class="text-danger"></span>
+                                    </select>
+                                    <span asp-validation-for="StudentsRefId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6" ng-if="PageInputs.Role === 'Staff'">
+                                <div class="form-group">
+                                    <label asp-for="StaffsRefId" class="form-label required d-block"></label>
+                                    <select class="form-control" asp-for="StaffsRefId">
+                                        @if (ViewBag.Staffs != null)
+                                        {
+                                            foreach (var items in ViewBag.Staffs)
+                                            {
+                                                <option value="@items.Id">@items.StaffName</option>
+                                            }
+                                        }
+                                    </select>
+                                    <span asp-validation-for="StaffsRefId" class="text-danger"></span>
+                                </div>
                             </div>
                         </div>
+                        
+                        
                         <div class="row col-12 col-md-6" style="float: right">
                             <div class="col text-end">
                                 <button type="submit" class="btn btn-primary btn-animation waves-effect waves-light px-4">

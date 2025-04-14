@@ -56,7 +56,8 @@ namespace RealTimeAttendanceTracker.Web
                         .AllowAnyHeader());
             });
             builder.Services.AddControllers();
-            //builder.WebHost.UseUrls("http://192.168.1.10:5248");
+            builder.Services.AddSignalR();
+            builder.WebHost.UseUrls("http://192.168.1.14:5248");
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -73,7 +74,8 @@ namespace RealTimeAttendanceTracker.Web
             app.UseRouting();
             app.UseCors("AllowAll");
             app.UseAuthorization();
-
+            builder.Services.AddEndpointsApiExplorer();
+            app.MapHub<AttendanceHub>("/attendanceHub");
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Login}/{action=Index}/{id?}");
