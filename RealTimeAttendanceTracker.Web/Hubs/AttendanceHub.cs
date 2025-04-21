@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
@@ -14,6 +15,24 @@ public class AttendanceHub : Hub
     private static ConcurrentDictionary<string, (double Lat, double Long)> StaffLocations = new();
     private static List<Dictionary<string, Dictionary<string, string>>> AttendanceHistory = new();
     private static Dictionary<string, List<AttendanceRecord>> _staffAttendanceMap = new();
+    private static readonly List<Point> ClassroomCorners = new List<Point>
+{
+    new Point(12.8197984, 79.7149611),  // South West
+    new Point(12.8197960, 79.7149726),  // North West
+    new Point(12.8197927, 79.7149697),  // North East
+    new Point(12.8197974, 79.7149668)   // South East
+};
+    public class Point
+    {
+        public double Lat { get; set; }
+        public double Lng { get; set; }
+
+        public Point(double lat, double lng)
+        {
+            Lat = lat;
+            Lng = lng;
+        }
+    }
 
     public override async Task OnConnectedAsync()
     {
@@ -59,6 +78,7 @@ public class AttendanceHub : Hub
 
     public async Task SendAttendanceRequest(string staffName)
     {
+        //TestStudentCoordinates();
         if (StaffLocations.TryGetValue(staffName, out var location))
         {
             double staffLat = location.Lat;
@@ -82,82 +102,103 @@ public class AttendanceHub : Hub
             }
         }
     }
-
-    public async Task RespondToAttendanceRequest(string studentName, bool isPresent, string staffName, double studentLat, double studentLong)
+    public async Task StudentAttendanceResponse(string studentName, string staffName, double studentLat, double studentLong)
     {
-        // Get staff's location
         if (StaffLocations.TryGetValue(staffName, out var staffLocation))
         {
-            double staffLat = staffLocation.Lat;
-            double staffLong = staffLocation.Long;
+            bool isInsidePolygon = IsInsidePolygon(studentLat, studentLong);
+            var (centerLat, centerLng) = GetClassroomCenter();
+            bool isNearCenter = IsWithinRadius(studentLat, studentLong, centerLat, centerLng, 2);
 
-            // Calculate the distance between the student and staff using Haversine formula
-            double distance = CalculateDistance(studentLat, studentLong, staffLat, staffLong);
+            bool IsPresent = isInsidePolygon || isNearCenter;
+            string status = IsPresent ? "Present" : "Absent";
 
-            // Check if the student is within 10-20 meters distance
-            bool isStudentNearStaff = distance >= 10 && distance <= 20;
+            Console.WriteLine($"Student Lat: {studentLat}, Lon: {studentLong} -> {status}");
 
-            // Mark as present if within the range, otherwise absent
-            string status = isStudentNearStaff ? "Present" : "Absent";
+            var existingRecord = _staffAttendanceMap.ContainsKey(staffName)
+                ? _staffAttendanceMap[staffName].FirstOrDefault(r => r.StudentName == studentName)
+                : null;
 
-            if (isPresent && isStudentNearStaff)
+            if (existingRecord != null)
             {
-                status = "Present"; // Confirm present if student is within range
+                existingRecord.Status = status;
+                existingRecord.Timestamp = DateTime.Now;
             }
             else
             {
-                status = "Absent"; // Otherwise, mark absent
+                var record = new AttendanceRecord
+                {
+                    StudentName = studentName,
+                    Status = status,
+                    Timestamp = DateTime.Now
+                };
+
+                if (!_staffAttendanceMap.ContainsKey(staffName))
+                    _staffAttendanceMap[staffName] = new List<AttendanceRecord>();
+
+                _staffAttendanceMap[staffName].Add(record);
             }
 
-            // Send the student's response (Yes/No) to the staff
-            if (StaffConnections.TryGetValue(staffName, out var staffConnId))
-            {
-                await Clients.Client(staffConnId).SendAsync("ReceiveAttendanceResponse", studentName, status);
-            }
+            await Clients.Caller.SendAsync("AttendanceConfirmed", $"Your attendance has been marked.");
 
-            // Optional: Save the attendance history
-            SaveAttendanceHistory(staffName, studentName, status);
-        }
-    }
-    public async Task StudentAttendanceResponse(string studentName, string staffName, double studentLat, double studentLong)
-    {
-        // Get staff location (you must maintain a dictionary or store this when the staff registers location)
-        if (StaffLocations.TryGetValue(staffName, out var staffLocation))
-        {
-            double staffLat = staffLocation.Lat;
-            double staffLong = staffLocation.Long;
-
-            double distance = CalculateDistance(studentLat, studentLong, staffLat, staffLong); // in meters
-            string status = (distance <= 10) ? "Present" : "Absent";
-
-            // Save or update attendance status in memory or DB
-            var record = new AttendanceRecord
-            {
-                StudentName = studentName,
-                Status = status,
-                Timestamp = DateTime.Now
-            };
-
-            if (!_staffAttendanceMap.ContainsKey(staffName))
-                _staffAttendanceMap[staffName] = new List<AttendanceRecord>();
-
-            _staffAttendanceMap[staffName].Add(record);
-
-            // Optionally notify student
-            await Clients.Caller.SendAsync("AttendanceConfirmed", $"{studentName} marked as {status}");
             var formattedData = _staffAttendanceMap[staffName]
-    .Select(record => new Dictionary<string, string>
-    {
-        { "name", record.StudentName },
-        { "status", record.Status }
-    })
-    .ToList<object>();
+                .Select(r => new Dictionary<string, string>
+                {
+                { "name", r.StudentName },
+                { "status", r.Status }
+                })
+                .ToList<object>();
 
-            // Push update to staff dashboard
             await Clients.Group(staffName).SendAsync("UpdateStaffGrid", formattedData);
         }
     }
 
+
+    public static bool IsInsidePolygon(double lat, double lng)
+    {
+        int count = ClassroomCorners.Count;
+        bool inside = false;
+
+        for (int i = 0, j = count - 1; i < count; j = i++)
+        {
+            double latI = ClassroomCorners[i].Lat;
+            double lngI = ClassroomCorners[i].Lng;
+            double latJ = ClassroomCorners[j].Lat;
+            double lngJ = ClassroomCorners[j].Lng;
+
+            bool intersect = ((lngI > lng) != (lngJ > lng)) &&
+                             (lat < (latJ - latI) * (lng - lngI) / (lngJ - lngI) + latI);
+            if (intersect)
+                inside = !inside;
+        }
+
+        return inside;
+    }
+
+    private static (double lat, double lng) GetClassroomCenter()
+    {
+        double avgLat = ClassroomCorners.Average(p => p.Lat);
+        double avgLng = ClassroomCorners.Average(p => p.Lng);
+        return (avgLat, avgLng);
+    }
+
+    // Haversine distance check
+    private static bool IsWithinRadius(double lat1, double lon1, double lat2, double lon2, double radiusMeters = 2)
+    {
+        var R = 6371000; // Radius of Earth in meters
+        var dLat = DegreesToRadians(lat2 - lat1);
+        var dLon = DegreesToRadians(lon2 - lon1);
+
+        var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
+                Math.Cos(DegreesToRadians(lat1)) * Math.Cos(DegreesToRadians(lat2)) *
+                Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
+        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+        return R * c <= radiusMeters;
+    }
+
+    private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180;
     private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
     {
         var R = 6371000; // Radius of the earth in meters
@@ -200,4 +241,21 @@ public class AttendanceHub : Hub
         };
         AttendanceHistory.Add(record);
     }
+    //public void TestStudentCoordinates()
+    //{
+    //    var studentCoordinates = new List<(double Lat, double Lng)>
+    //{
+    //    (12.8197898, 79.7149625),  // Should be inside
+    //    (12.8197873, 79.7149677),  // Should be inside
+    //    (12.8197865, 79.7149656),  // Should be inside
+    //    (12.8197918, 79.7149707),  // Should be inside
+    //    (12.8197784, 79.7149352)   // Should be outside
+    //};
+
+    //    foreach (var (studentLat, studentLong) in studentCoordinates)
+    //    {
+    //        var result = IsInsideBoundingBox(studentLat, studentLong) ? "Present" : "Absent";
+    //        Console.WriteLine($"Student Lat: {studentLat}, Lon: {studentLong} -> {result}");
+    //    }
+    //}
 }
