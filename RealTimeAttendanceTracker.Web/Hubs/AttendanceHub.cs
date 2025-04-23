@@ -22,6 +22,12 @@ public class AttendanceHub : Hub
     new Point(12.8197927, 79.7149697),  // North East
     new Point(12.8197974, 79.7149668)   // South East
 };
+    public enum GeofenceMode
+    {
+        PolygonOnly,
+        RadiusOnly,
+        PolygonWithRadiusFallback
+    }
     public class Point
     {
         public double Lat { get; set; }
@@ -102,18 +108,40 @@ public class AttendanceHub : Hub
             }
         }
     }
+    public async Task UpdateStudentStatus(string staffName, string studentName, string status)
+    {
+        try
+        {
+            var existingRecord = _staffAttendanceMap.ContainsKey(staffName)
+                ? _staffAttendanceMap[staffName].FirstOrDefault(r => r.StudentName == studentName)
+                : null;
+            if (existingRecord != null)
+            {
+                existingRecord.Status = status;
+                existingRecord.Timestamp = DateTime.Now;
+            }
+            var updatedRecord = new Dictionary<string, string>
+{
+    { "name", studentName },
+    { "status", status }
+};
+
+            await Clients.Group(staffName).SendAsync("UpdateStaffGrid", updatedRecord);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
+    }
     public async Task StudentAttendanceResponse(string studentName, string staffName, double studentLat, double studentLong)
     {
         if (StaffLocations.TryGetValue(staffName, out var staffLocation))
         {
-            bool isInsidePolygon = IsInsidePolygon(studentLat, studentLong);
-            var (centerLat, centerLng) = GetClassroomCenter();
-            bool isNearCenter = IsWithinRadius(studentLat, studentLong, centerLat, centerLng, 2);
-
-            bool IsPresent = isInsidePolygon || isNearCenter;
+            // Apply geofencing logic here
+            bool IsPresent = IsStudentInGeofence(studentLat, studentLong, GeofenceMode.PolygonWithRadiusFallback, 1.0);
             string status = IsPresent ? "Present" : "Absent";
 
-            Console.WriteLine($"Student Lat: {studentLat}, Lon: {studentLong} -> {status}");
+            Console.WriteLine($"Student: {studentName}, Lat: {studentLat}, Long: {studentLong} -> {status}");
 
             var existingRecord = _staffAttendanceMap.ContainsKey(staffName)
                 ? _staffAttendanceMap[staffName].FirstOrDefault(r => r.StudentName == studentName)
@@ -141,18 +169,36 @@ public class AttendanceHub : Hub
 
             await Clients.Caller.SendAsync("AttendanceConfirmed", $"Your attendance has been marked.");
 
-            var formattedData = _staffAttendanceMap[staffName]
-                .Select(r => new Dictionary<string, string>
-                {
-                { "name", r.StudentName },
-                { "status", r.Status }
-                })
-                .ToList<object>();
+            var updatedRecord = new Dictionary<string, string>
+{
+    { "name", studentName },
+    { "status", status }
+};
 
-            await Clients.Group(staffName).SendAsync("UpdateStaffGrid", formattedData);
+            await Clients.Group(staffName).SendAsync("UpdateStaffGrid", updatedRecord);
         }
     }
 
+    // Master geofencing logic (polygon + radius)
+    public static bool IsStudentInGeofence(double studentLat, double studentLng, GeofenceMode mode = GeofenceMode.PolygonWithRadiusFallback, double radiusInMeters = 2)
+    {
+        switch (mode)
+        {
+            case GeofenceMode.PolygonOnly:
+                return IsInsidePolygon(studentLat, studentLng);
+            case GeofenceMode.RadiusOnly:
+                var (centerLat, centerLng) = GetClassroomCenter();
+                return IsWithinRadius(studentLat, studentLng, centerLat, centerLng, radiusInMeters);
+            case GeofenceMode.PolygonWithRadiusFallback:
+            default:
+                if (IsInsidePolygon(studentLat, studentLng))
+                {
+                    (centerLat, centerLng) = GetClassroomCenter();
+                    return IsWithinRadius(studentLat, studentLng, centerLat, centerLng, radiusInMeters);
+                }
+                return false;
+        }
+    }
 
     public static bool IsInsidePolygon(double lat, double lng)
     {
@@ -166,6 +212,9 @@ public class AttendanceHub : Hub
             double latJ = ClassroomCorners[j].Lat;
             double lngJ = ClassroomCorners[j].Lng;
 
+            if (IsPointOnLineSegment(lat, lng, latI, lngI, latJ, lngJ))
+                return true;
+
             bool intersect = ((lngI > lng) != (lngJ > lng)) &&
                              (lat < (latJ - latI) * (lng - lngI) / (lngJ - lngI) + latI);
             if (intersect)
@@ -175,6 +224,18 @@ public class AttendanceHub : Hub
         return inside;
     }
 
+    private static bool IsPointOnLineSegment(double lat, double lng, double lat1, double lng1, double lat2, double lng2)
+    {
+        if (lng < Math.Min(lng1, lng2) || lng > Math.Max(lng1, lng2))
+            return false;
+        if (lat < Math.Min(lat1, lat2) || lat > Math.Max(lat1, lat2))
+            return false;
+
+        double crossProduct = (lat - lat1) * (lng2 - lng1) - (lat2 - lat1) * (lng - lng1);
+        return Math.Abs(crossProduct) < 1e-10; 
+    }
+
+    // Calculate the center of classroom polygon
     private static (double lat, double lng) GetClassroomCenter()
     {
         double avgLat = ClassroomCorners.Average(p => p.Lat);
@@ -182,10 +243,10 @@ public class AttendanceHub : Hub
         return (avgLat, avgLng);
     }
 
-    // Haversine distance check
+    // Check if location is within radius using Haversine formula
     private static bool IsWithinRadius(double lat1, double lon1, double lat2, double lon2, double radiusMeters = 2)
     {
-        var R = 6371000; // Radius of Earth in meters
+        var R = 6371000; // Earth's radius in meters
         var dLat = DegreesToRadians(lat2 - lat1);
         var dLon = DegreesToRadians(lon2 - lon1);
 
@@ -198,19 +259,20 @@ public class AttendanceHub : Hub
         return R * c <= radiusMeters;
     }
 
+    // Helper: Degrees to radians
     private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180;
-    private double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
+    private static double CalculateDistance(double lat1, double lon1, double lat2, double lon2)
     {
-        var R = 6371000; // Radius of the earth in meters
-        var dLat = (lat2 - lat1) * Math.PI / 180;
-        var dLon = (lon2 - lon1) * Math.PI / 180;
+        var R = 6371000; // in meters
+        var dLat = DegreesToRadians(lat2 - lat1);
+        var dLon = DegreesToRadians(lon2 - lon1);
 
         var a = Math.Sin(dLat / 2) * Math.Sin(dLat / 2) +
-                Math.Cos(lat1 * Math.PI / 180) * Math.Cos(lat2 * Math.PI / 180) *
+                Math.Cos(DegreesToRadians(lat1)) * Math.Cos(DegreesToRadians(lat2)) *
                 Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
+
         var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-        var distance = R * c; // Distance in meters
-        return distance;
+        return R * c;
     }
 
 
